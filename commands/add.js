@@ -8,6 +8,6 @@ module.exports = {
 		// example - !ticket <long text>
 
 	},
-	permissions: [],
-	requiredRoles: []
+	permissions: ['ADMINISTRATOR'],
+	requiredRoles: ['Math']
 }
