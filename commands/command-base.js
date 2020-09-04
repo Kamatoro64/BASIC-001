@@ -103,6 +103,24 @@ module.exports = (client, commandOptions) => {
 						}
 					}
 
+					// Split message into an array of strings
+					// Split using a regular expression, allowing users from using more than 1 space
+					const arguments = content.split(/[ ]+/)
+
+					// remove first element of array (the command)
+					arguments.shift()
+
+					// Check arguments
+					if (arguments.length < minArgs || (maxArgs !== null && arguments.length > maxArgs)) {
+						// We use the alias that the user used to not cause confusion
+						message.reply(`Incorrect syntax! Use ${prefix}${alias} ${expectedArgs}`)
+					}
+
+					// Handle the custom command
+					callback(message, arguments, arguments.join(' '))
+
+
+
 					return // Return on first valid alias 
 
 				}
