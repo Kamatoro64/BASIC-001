@@ -1,6 +1,6 @@
 const { prefix } = require('../config.json')
 
-const validatePermissions = (permission) => {
+const validatePermissions = (permissions) => {
 	const validPermissions = [
 		'ADD_REACTIONS',
 		'ADMINISTRATOR',
@@ -65,6 +65,9 @@ module.exports = (client, commandOptions) => {
 	if (typeof commands === 'string') {
 		commands = [commands]
 	}
+
+	// Log to console when the command is "registered"
+	console.log(`Registering command "${commands[0]}"`)
 
 
 	if (permissions.length) { // Check if exists, works for string or array
