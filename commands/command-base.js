@@ -103,12 +103,12 @@ module.exports = (client, commandOptions) => {
 						}
 					}
 
-
+					return // Return on first valid alias 
 
 				}
 
 
-				return // Return on first valid alias 
+
 			}
 
 		})
