@@ -75,6 +75,44 @@ module.exports = (client, commandOptions) => {
 		// Check that each permission in the permissions array is a valid discord permission
 		validatePermissions(permissions)
 
+		// Listen for messages
+		client.on('message', message => {
+			const { member, content, guild } = message
+
+
+			for (const alias of commands) {
+				// Case insensitive command handler
+				if (content.toLowerCase().startsWith(`${prefix}${alias.toLowerCase()}`)) {
+					// Command can be run
+
+					// Ensure user has required permisisons
+					for (const permission of permissions) {
+						if (!member.hasPermission(permission)) {
+							message.reply(permissionError)
+							return // Do not continue executing function!
+						}
+					}
+
+					// Ensure user has required roles
+					for (const requiredRole of requiredRoles) {
+						const role = guild.roles.cache.find(role => role.name === requiredRole)
+
+						if (!role || !member.roles.cache.has(role.id)) {
+							message.reply(`You must have the "${requiredRole}" role to use this command.`)
+							return // Again, Do not continue executing function if role check fails
+						}
+					}
+
+
+
+				}
+
+
+				return // Return on first valid alias 
+			}
+
+		})
+
 
 	}
 
