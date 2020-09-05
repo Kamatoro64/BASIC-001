@@ -69,7 +69,6 @@ module.exports = (client, commandOptions) => {
 	// Log to console when the command is "registered"
 	console.log(`Registering command "${commands[0]}"`)
 
-
 	if (permissions.length) { // Check if exists, works for string or array
 		if (typeof permissions === 'string') {
 			permissions = [permissions]
@@ -77,65 +76,54 @@ module.exports = (client, commandOptions) => {
 
 		// Check that each permission in the permissions array is a valid discord permission
 		validatePermissions(permissions)
+	}
+	// Listen for messages
+	client.on('message', message => {
+		const { member, content, guild } = message
 
-		// Listen for messages
-		client.on('message', message => {
-			const { member, content, guild } = message
+		for (const alias of commands) {
+			// Case insensitive command handler
+			if (content.toLowerCase().startsWith(`${prefix}${alias.toLowerCase()}`)) {
 
-
-			for (const alias of commands) {
-				// Case insensitive command handler
-				if (content.toLowerCase().startsWith(`${prefix}${alias.toLowerCase()}`)) {
-					// Command can be run
-
-					// Ensure user has required permisisons
-					for (const permission of permissions) {
-						if (!member.hasPermission(permission)) {
-							message.reply(permissionError)
-							return // Do not continue executing function!
-						}
+				// Ensure user has required permisisons
+				for (const permission of permissions) {
+					if (!member.hasPermission(permission)) {
+						message.reply(permissionError)
+						return // Do not continue executing function!
 					}
-
-					// Ensure user has required roles
-					for (const requiredRole of requiredRoles) {
-						const role = guild.roles.cache.find(role => role.name === requiredRole)
-
-						if (!role || !member.roles.cache.has(role.id)) {
-							message.reply(`You must have the "${requiredRole}" role to use this command.`)
-							return // Again, Do not continue executing function if role check fails
-						}
-					}
-
-					// Split message into an array of strings
-					// Split using a regular expression, allowing users from using more than 1 space
-					const arguments = content.split(/[ ]+/)
-
-					// remove first element of array (the command)
-					arguments.shift()
-
-					// Check arguments
-					if (arguments.length < minArgs || (maxArgs !== null && arguments.length > maxArgs)) {
-						// We use the alias that the user used to not cause confusion
-						message.reply(`Incorrect syntax! Use ${prefix}${alias} ${expectedArgs}`)
-					}
-
-					// Handle the custom command
-					callback(message, arguments, arguments.join(' '))
-
-
-
-					return // Return on first valid alias 
-
 				}
 
 
+				// Ensure user has required roles
+				for (const requiredRole of requiredRoles) {
+					const role = guild.roles.cache.find(role => role.name === requiredRole)
+
+					if (!role || !member.roles.cache.has(role.id)) {
+						message.reply(`You must have the "${requiredRole}" role to use this command.`)
+						return // Again, Do not continue executing function if role check fails
+					}
+				}
+
+				// Split message into an array of strings
+				// Split using a regular expression, allowing users from using more than 1 space
+				const arguments = content.split(/[ ]+/)
+
+				// remove first element of array (the command)
+				arguments.shift()
+				// Check arguments
+				if (arguments.length < minArgs || (maxArgs !== null && arguments.length > maxArgs)) {
+					// We use the alias that the user used to not cause confusion
+					message.reply(`Incorrect syntax! Use ${prefix}${alias} ${expectedArgs}`)
+					return
+				}
+				// Handle the custom command
+				callback(message, arguments, arguments.join(' '))
+
+				return // Return on first valid alias 
 
 			}
-
-		})
-
-
-	}
-
-
+		}
+	})
 }
+
+
