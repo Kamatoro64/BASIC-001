@@ -4,7 +4,6 @@ const Discord = require('discord.js')
 const client = new Discord.Client()
 const config = require('./config.json') // Config is a JSON Object
 const mongo = require('./mongo')
-const messageCounter = require('./message-counter')
 
 client.on('ready', async () => {
 	console.log('The client is ready')
@@ -38,13 +37,6 @@ client.on('ready', async () => {
 
 	readCommands('commands') // Directory called commands
 
-
-
-
-
-	//messageCounter(client)
-
-	//welcome(client)
 })
 
 
