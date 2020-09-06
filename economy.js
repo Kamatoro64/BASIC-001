@@ -8,7 +8,7 @@ module.exports = (client) => {
 }
 
 module.exports.getCoins = async (guildId, userId) => {
-	return await mongo.then(async mongoose => {
+	return await mongo().then(async mongoose => {
 		try {
 			console.log(`Running findOne()`)
 
