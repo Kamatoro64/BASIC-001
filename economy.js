@@ -6,6 +6,37 @@ const profileSchema = require('./schemas/profile-schema')
 module.exports = (client) => {
 	// Placeholder for now
 }
+module.exports.addCoins = async (guildId, userId, coins) => {
+
+	// This function should return no. of coins (updated)
+	return await mongo().then(async (mongoose) => {
+		try {
+			console.log('Running findOneAndUpdate')
+			const result = await profileSchema.findOneAndUpdate({
+				// Find criteria
+				guildId,
+				userId
+			}, {
+				guildId,
+				userId,
+				$inc: {
+					coins
+				}
+			}, {
+				upsert: true, // If no match (no entry to update), insert
+				new: true //Return the UPDATED document, instead of the original one
+			})
+
+			console.log('RESULT:', result)
+
+			// Were are returning the coins property of the document stored in the result variable
+			return result.coins
+
+		} finally {
+			mongoose.connection.close()
+		}
+	})
+}
 
 module.exports.getCoins = async (guildId, userId) => {
 	return await mongo().then(async mongoose => {
