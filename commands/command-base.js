@@ -83,7 +83,7 @@ module.exports = (client, commandOptions) => {
 
 		for (const alias of commands) {
 			// Case insensitive command handler
-			if (content.toLowerCase().startsWith(`${prefix}${alias.toLowerCase()}`)) {
+			if (content.split(' ')[0].toLowerCase() === `${prefix}${alias}`.toLowerCase()) {
 
 				// Ensure user has required permisisons
 				for (const permission of permissions) {
