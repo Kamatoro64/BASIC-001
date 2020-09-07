@@ -1,11 +1,16 @@
 const mongo = require('./mongo')
 const profileSchema = require('./schemas/profile-schema')
 
-
+/* 
+Cache coin data in memory to prevent unnecessary database calls
+Everytime we return the no. of coins to the user we have to update the cache. getCoins, addCoins 
+*/
+const coinsCache = new Map()
 
 module.exports = (client) => {
 	// Placeholder for now
 }
+
 module.exports.addCoins = async (guildId, userId, coins) => {
 
 	// This function should return no. of coins (updated)
@@ -29,6 +34,8 @@ module.exports.addCoins = async (guildId, userId, coins) => {
 
 			console.log('RESULT:', result)
 
+			coinsCache.set(`${guildId}-${userId}`, result.coins)
+
 			// Were are returning the coins property of the document stored in the result variable
 			return result.coins
 
@@ -39,6 +46,14 @@ module.exports.addCoins = async (guildId, userId, coins) => {
 }
 
 module.exports.getCoins = async (guildId, userId) => {
+
+	// Check coins cache for coins using key =  guildId-userId
+	const cachedValue = coinsCache.get(`${guildId}-${userId}`)
+
+	if (cachedValue) {
+		return cachedValue
+	}
+
 	return await mongo().then(async mongoose => {
 		try {
 			console.log(`Running findOne()`)
@@ -64,6 +79,8 @@ module.exports.getCoins = async (guildId, userId) => {
 					coins // Set to 0 above
 				}).save()
 			}
+
+			coinsCache.set(`${guildId}-${userId}`, coins)
 
 			return coins // Return no. of coins
 		} finally {
