@@ -66,6 +66,7 @@ module.exports.getHealth = async (guildId, userId) => {
 			console.log('RESULT: ', result)
 
 			let health = 100 //default
+			let coins = 0 //default
 
 			if (result) {
 				// If user profile exists, retrieve health
@@ -76,6 +77,7 @@ module.exports.getHealth = async (guildId, userId) => {
 				await new profileSchema({
 					guildId,
 					userId,
+					coins,
 					health // Set to 100 by default
 				}).save()
 			}
@@ -88,3 +90,36 @@ module.exports.getHealth = async (guildId, userId) => {
 		}
 	})
 }
+
+module.exports.setHealth = async (guildId, userId, health) => {
+
+	// This function should health (updated)
+	return await mongo().then(async (mongoose) => {
+		try {
+			console.log('Running findOneAndUpdate')
+			const result = await profileSchema.findOneAndUpdate({
+				// Find criteria
+				guildId,
+				userId
+			}, {
+				guildId,
+				userId,
+				health
+			}, {
+				upsert: true, // If no match (no entry to update), insert
+				new: true //Return the UPDATED document, instead of the original one
+			})
+
+			console.log('RESULT:', result)
+
+			healthCache.set(`${guildId}-${userId}`, result.health)
+
+			// Were are returning the coins property of the document stored in the result variable
+			return result.health
+
+		} finally {
+			mongoose.connection.close()
+		}
+	})
+}
+
