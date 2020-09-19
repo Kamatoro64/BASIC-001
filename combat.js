@@ -29,7 +29,8 @@ module.exports.addHealth = async (guildId, userId, health) => {
 				}
 			}, {
 				upsert: true, // If no match (no entry to update), insert
-				new: true //Return the UPDATED document, instead of the original one
+				new: true, //Return the UPDATED document, instead of the original one
+				setDefaultsOnInsert: true
 			})
 
 			console.log('RESULT:', result)
@@ -66,7 +67,6 @@ module.exports.getHealth = async (guildId, userId) => {
 			console.log('RESULT: ', result)
 
 			let health = 100 //default
-			let coins = 0 //default
 
 			if (result) {
 				// If user profile exists, retrieve health
@@ -76,9 +76,7 @@ module.exports.getHealth = async (guildId, userId) => {
 				console.log('Inserting a document')
 				await new profileSchema({
 					guildId,
-					userId,
-					coins,
-					health // Set to 100 by default
+					userId
 				}).save()
 			}
 

@@ -6,17 +6,17 @@ module.exports = {
 	maxArgs: 1,
 	expectedArgs: "<The target's @>",
 	callback: async (message, arguments) => {
-		/*
-			Notice this section only contains logic on how the callback function
-			handles the message and arguments (include input sanitisation).
 
-			Once this it done it calls a function from economy.js that handles
-			the database logic. This means if we need to add coins to a user via
-			a different method (not by calling a bot command), we can easily call
-			the same function from economy.js
+		const casterCurrentHealth = await combat.getHealth(message.guild.id, message.author.id)
 
-			This separation is extremely important
-		*/
+		if (casterCurrentHealth === 0) {
+			message.reply(`Unable to cast commands when dead`)
+			return
+		}
+
+		// Specify amount to heal for each pet
+		const petHealAmount = 5
+
 		const mention = message.mentions.users.first()
 
 		if (!mention) {
@@ -31,9 +31,6 @@ module.exports = {
 			message.channel.send(`<@${message.author.id}> Why are you petting yourself? Is everything okay?`)
 			return
 		}
-
-		const petHealAmount = 5
-		// callback has to be asynchronous since we're using await
 
 		const currentHealth = await combat.getHealth(guildId, userId)
 

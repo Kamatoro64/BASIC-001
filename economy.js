@@ -27,9 +27,11 @@ module.exports.addCoins = async (guildId, userId, coins) => {
 				$inc: {
 					coins
 				}
+
 			}, {
 				upsert: true, // If no match (no entry to update), insert
-				new: true //Return the UPDATED document, instead of the original one
+				new: true, //Return the UPDATED document, instead of the original one
+				setDefaultsOnInsert: true
 			})
 
 			console.log('RESULT:', result)
@@ -76,7 +78,6 @@ module.exports.getCoins = async (guildId, userId) => {
 				await new profileSchema({
 					guildId,
 					userId,
-					coins // Set to 0 above
 				}).save()
 			}
 
