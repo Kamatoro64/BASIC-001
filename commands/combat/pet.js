@@ -39,6 +39,7 @@ module.exports = {
 		// Use the MAX_HEALTH constant from combat.js (In case modify it in the future)
 		const MAX_HEALTH = combat.getMaxHealth()
 
+		// Use the combat methods to implement the logic we want the pet command
 		if (targetHealth === MAX_HEALTH) {
 			message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target health is ${targetHealth}`)
 		} else
