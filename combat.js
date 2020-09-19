@@ -1,6 +1,11 @@
 const mongo = require('./mongo')
 const profileSchema = require('./schemas/profile-schema')
 
+
+// CONSTANTS
+const MAX_HEALTH = 100
+
+
 /* 
 Cache health data in memory to prevent unnecessary database calls
 Everytime we return the health to the user we have to update the cache. getHealth, addHealth, setHealth 
@@ -9,6 +14,11 @@ const healthCache = new Map()
 
 module.exports = (client) => {
 	// Placeholder for now
+}
+
+
+module.exports.getMaxHealth = () => {
+	return MAX_HEALTH
 }
 
 module.exports.addHealth = async (guildId, userId, health) => {
