@@ -42,6 +42,7 @@ module.exports = {
 		} else
 
 			if ((currentHealth + petHealAmount) >= 100) {
+				// If resulting health after pet exceed 100, set target health to 100
 				const newHealth = await combat.setHealth(guildId, userId, 100)
 				message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target HP is now ${newHealth}`)
 			} else {

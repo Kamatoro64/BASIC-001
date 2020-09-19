@@ -2,8 +2,8 @@ const mongo = require('./mongo')
 const profileSchema = require('./schemas/profile-schema')
 
 /* 
-Cache coin data in memory to prevent unnecessary database calls
-Everytime we return the no. of coins to the user we have to update the cache. getCoins, addCoins 
+Cache health data in memory to prevent unnecessary database calls
+Everytime we return the health to the user we have to update the cache. getHealth, addHealth, setHealth 
 */
 const healthCache = new Map()
 
@@ -36,7 +36,7 @@ module.exports.addHealth = async (guildId, userId, health) => {
 
 			healthCache.set(`${guildId}-${userId}`, result.health)
 
-			// Were are returning the coins property of the document stored in the result variable
+			// Were are returning the health property of the document stored in the result variable
 			return result.health
 
 		} finally {
@@ -47,7 +47,7 @@ module.exports.addHealth = async (guildId, userId, health) => {
 
 module.exports.getHealth = async (guildId, userId) => {
 
-	// Check coins cache for coins using key =  guildId-userId
+	// Check health cache for health using key =  guildId-userId
 	const cachedValue = healthCache.get(`${guildId}-${userId}`)
 
 	if (cachedValue) {
@@ -114,7 +114,7 @@ module.exports.setHealth = async (guildId, userId, health) => {
 
 			healthCache.set(`${guildId}-${userId}`, result.health)
 
-			// Were are returning the coins property of the document stored in the result variable
+			// Were are returning the health property of the document stored in the result variable
 			return result.health
 
 		} finally {
