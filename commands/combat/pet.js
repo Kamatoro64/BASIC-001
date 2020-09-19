@@ -7,6 +7,7 @@ module.exports = {
 	expectedArgs: "<The target's @>",
 	callback: async (message, arguments) => {
 
+		// This has to be duplicated for each command, move it elsewhere
 		const casterCurrentHealth = await combat.getHealth(message.guild.id, message.author.id)
 
 		if (casterCurrentHealth === 0) {
@@ -15,7 +16,7 @@ module.exports = {
 		}
 
 		// Specify amount to heal for each pet
-		const petHealAmount = 5
+		const PET_HEAL_POTENCY = 5
 
 		const mention = message.mentions.users.first()
 
@@ -32,19 +33,21 @@ module.exports = {
 			return
 		}
 
-		const currentHealth = await combat.getHealth(guildId, userId)
+		// Get target's current health
+		let targetHealth = await combat.getHealth(guildId, userId)
 
-		if (currentHealth === 100) {
-			message.channel.send(`<@${message.author.id}> gently pets <@${userId}>.`)
+		// Use the MAX_HEALTH constant from combat.js (In case modify it in the future)
+		const MAX_HEALTH = combat.getMaxHealth()
+
+		if (targetHealth === MAX_HEALTH) {
+			message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target health is ${targetHealth}`)
 		} else
-
-			if ((currentHealth + petHealAmount) >= 100) {
-				// If resulting health after pet exceed 100, set target health to 100
-				const newHealth = await combat.setHealth(guildId, userId, 100)
-				message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target HP is now ${newHealth}`)
+			if ((targetHealth + PET_HEAL_POTENCY) >= MAX_HEALTH) {
+				const newHealth = await combat.setHealth(guildId, userId, MAX_HEALTH) // Expect 100
+				message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target HP is now ${newHealth} (+${newHealth - targetHealth})`)
 			} else {
-				const newHealth = await combat.addHealth(guildId, userId, petHealAmount)
-				message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target HP is now ${newHealth}`)
+				const newHealth = await combat.addHealth(guildId, userId, PET_HEAL_POTENCY)
+				message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target HP is now ${newHealth} (+${newHealth - targetHealth})`)
 			}
 
 
