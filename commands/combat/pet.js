@@ -11,15 +11,21 @@ module.exports = {
 		const PET_HEAL_POTENCY = 5
 		const MAX_HEALTH = combat.getMaxHealth()
 
+		// Guild ID
+		const guildId = message.guild.id
+
+		// Caster Identifier
+		const casterId = message.member.id
+
 		// Case: Caster Dead
-		const casterCurrentHealth = await combat.getHealth(message.guild.id, message.author.id)
+		const casterCurrentHealth = await combat.getHealth(guildId, casterId)
 
 		if (casterCurrentHealth === 0) {
 			message.channel.send(`Unable to cast commands when dead`)
 			return
 		}
 
-		// Target Check
+		// Target exists?
 		const mention = message.mentions.users.first()
 
 		if (!mention) {
@@ -28,17 +34,16 @@ module.exports = {
 		}
 
 		// Target Identifier
-		const guildId = message.guild.id
-		const userId = mention.id
+		const targetId = mention.id
 
 		// Case: Target == Caster
-		if (userId === message.author.id) {
-			message.channel.send(`<@${message.author.id}> Why are you petting yourself? Is everything okay?`)
+		if (targetId === casterId) {
+			message.channel.send(`<@${casterId}> Why are you petting yourself? Is everything okay?`)
 			return
 		}
 
 		// Get target's current health
-		let targetHealth = await combat.getHealth(guildId, userId)
+		let targetHealth = await combat.getHealth(guildId, targetId)
 
 
 		// Case: Target dead
@@ -50,11 +55,15 @@ module.exports = {
 		// Compute target health after heal. 
 		let newHealth = targetHealth + PET_HEAL_POTENCY
 
-		if (newHealth >= MAX_HEALTH) { // Case: Overheal
-			newHealth = await combat.setHealth(guildId, userId, MAX_HEALTH) // Todo: Extra Database call if 100. Separate = and >
+		if (targetHealth === MAX_HEALTH) { // Case: Overheal
+			console.log(`Target already at Max health. setHealth() not required`)
+			newHealth = MAX_HEALTH
+		} else if (newHealth > MAX_HEALTH) {
+			console.log(`Case overheal. Set health to 100`)
+			newHealth = await combat.setHealth(guildId, targetId, MAX_HEALTH) // Set newHealth to 100 if overheal
 		}
 
-		message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target HP is now ${newHealth} (+${newHealth - targetHealth})`)
+		message.channel.send(`<@${casterId}> gently pets <@${targetId}>. Target HP is now ${newHealth} (+${newHealth - targetHealth})`)
 	}
 
 }
