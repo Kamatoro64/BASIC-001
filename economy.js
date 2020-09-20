@@ -52,9 +52,11 @@ module.exports.getCoins = async (guildId, userId) => {
 	// Check coins cache for coins using key =  guildId-userId
 	const cachedValue = coinsCache.get(`${guildId}-${userId}`)
 
-	if (cachedValue) {
+	if (cachedValue !== undefined) {
+		console.log(`getCoins method found cached value and bypassing Database search`)
 		return cachedValue
 	}
+	console.log(`Cache value not found, database search required`)
 
 	return await mongo().then(async mongoose => {
 		try {

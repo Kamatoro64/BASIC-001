@@ -61,9 +61,11 @@ module.exports.getHealth = async (guildId, userId) => {
 	// Check health cache for health using key =  guildId-userId
 	const cachedValue = healthCache.get(`${guildId}-${userId}`)
 
-	if (cachedValue) {
+	if (cachedValue !== undefined) {
+		console.log(`getHealth method found cached value and bypassing Database search`)
 		return cachedValue
 	}
+	console.log(`Cache value not found, database search required`)
 
 	return await mongo().then(async mongoose => {
 		try {
