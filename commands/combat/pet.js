@@ -7,17 +7,19 @@ module.exports = {
 	expectedArgs: "<The target's @>",
 	callback: async (message, arguments) => {
 
-		// This has to be duplicated for each command, move it elsewhere
+		// CONSTANTS
+		const PET_HEAL_POTENCY = 5
+		const MAX_HEALTH = combat.getMaxHealth()
+
+		// Case: Caster Dead
 		const casterCurrentHealth = await combat.getHealth(message.guild.id, message.author.id)
 
 		if (casterCurrentHealth === 0) {
-			message.reply(`Unable to cast commands when dead`)
+			message.channel.send(`Unable to cast commands when dead`)
 			return
 		}
 
-		// Specify amount to heal for each pet
-		const PET_HEAL_POTENCY = 5
-
+		// Target Check
 		const mention = message.mentions.users.first()
 
 		if (!mention) {
@@ -25,9 +27,11 @@ module.exports = {
 			return
 		}
 
+		// Target Identifier
 		const guildId = message.guild.id
 		const userId = mention.id
 
+		// Case: Target == Caster
 		if (userId === message.author.id) {
 			message.channel.send(`<@${message.author.id}> Why are you petting yourself? Is everything okay?`)
 			return
@@ -36,22 +40,21 @@ module.exports = {
 		// Get target's current health
 		let targetHealth = await combat.getHealth(guildId, userId)
 
-		// Use the MAX_HEALTH constant from combat.js (In case modify it in the future)
-		const MAX_HEALTH = combat.getMaxHealth()
 
-		// Use the combat methods to implement the logic we want the pet command
-		if (targetHealth === MAX_HEALTH) {
-			message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target health is ${targetHealth}`)
-		} else
-			if ((targetHealth + PET_HEAL_POTENCY) >= MAX_HEALTH) {
-				const newHealth = await combat.setHealth(guildId, userId, MAX_HEALTH) // Expect 100
-				message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target HP is now ${newHealth} (+${newHealth - targetHealth})`)
-			} else {
-				const newHealth = await combat.addHealth(guildId, userId, PET_HEAL_POTENCY)
-				message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target HP is now ${newHealth} (+${newHealth - targetHealth})`)
-			}
+		// Case: Target dead
+		if (targetHealth === 0) {
+			message.channel.send(`Target is dead`)
+			return
+		}
 
+		// Compute target health after heal. 
+		let newHealth = targetHealth + PET_HEAL_POTENCY
 
+		if (newHealth >= MAX_HEALTH) { // Case: Overheal
+			newHealth = await combat.setHealth(guildId, userId, MAX_HEALTH) // Todo: Extra Database call if 100. Separate = and >
+		}
+
+		message.channel.send(`<@${message.author.id}> gently pets <@${userId}>. Target HP is now ${newHealth} (+${newHealth - targetHealth})`)
 	}
 
 }
