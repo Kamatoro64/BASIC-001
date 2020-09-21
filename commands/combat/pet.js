@@ -61,6 +61,9 @@ module.exports = {
 		} else if (newHealth > MAX_HEALTH) {
 			console.log(`Case overheal. Set health to 100`)
 			newHealth = await combat.setHealth(guildId, targetId, MAX_HEALTH) // Set newHealth to 100 if overheal
+		} else {
+			console.log(`Case normal pet execution. Use addHealth to add PET_HEAL_POTENCY to target`)
+			newHealth = await combat.addHealth(guildId, targetId, PET_HEAL_POTENCY)
 		}
 
 		message.channel.send(`<@${casterId}> gently pets <@${targetId}>. Target HP is now ${newHealth} (+${newHealth - targetHealth})`)
